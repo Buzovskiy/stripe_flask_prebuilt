@@ -21,14 +21,17 @@ YOUR_DOMAIN = 'http://localhost:3000'
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
+        # Create product
+        product = stripe.Product.create(name="Order 1")
+
+        price = stripe.Price.create(
+            unit_amount=2005,
+            currency="eur",
+            product=product.id,
+        )
+
         checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    'price': 'price_1NvGjlABhNwAdaFhRUFTnsbk',
-                    'quantity': 1,
-                },
-            ],
+            line_items=[{'price': price.id, 'quantity': 1}],
             mode='payment',
             success_url=YOUR_DOMAIN + '?success=true',
             cancel_url=YOUR_DOMAIN + '?canceled=true',
